@@ -6,7 +6,8 @@ from .assets import (source_ddl_transactions,
                      source_ddl_type_opers,
                      source_data_transactions,
                      source_data_opers,
-                     destination_ddl_transactions)
+                     destination_ddl_transactions,
+                     destination_data_transaction)
 
 
 def get_session_id():
@@ -61,3 +62,13 @@ def load_struct_to_destination_db(mysql_credentials):
     with conn:
         with conn.cursor() as c:
             c.execute(destination_ddl_transactions)
+
+
+def load_assets_to_destination_db(mysql_credentials):
+    conn = pymysql.connect(**mysql_credentials)
+    with conn:
+        with conn.cursor() as c:
+            c.executemany("""INSERT INTO transactions_denormalized 
+            (id, dt, idoper, move, amount, name_oper) 
+            VALUES (%s, %s, %s, %s, %s, %s)""",
+                          destination_data_transaction)

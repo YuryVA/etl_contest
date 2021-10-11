@@ -55,21 +55,29 @@ def data_transfer(creds_src, creds_dst):
     if latest_date["date"]:
         date = latest_date["date"]
         print(f"Last entry found in destination table on {date}. Resume transfer")
+        query = """
+                SELECT t.id, t.dt, t.idoper, t.move, t.amount,
+                ot.name as name_oper
+                FROM transactions t
+                JOIN operation_types ot ON t.idoper = ot.id
+                WHERE t.dt > %s and t.dt <= %s
+                """
     elif begin_date["date"]:
         date = begin_date["date"]
         print(f"No entry found in destination table. Start a new transfer")
-    else:
-        return "Nothing to transfer. The source table is empty"
-    query_in = """
+        query = """
                 SELECT t.id, t.dt, t.idoper, t.move, t.amount,
                 ot.name as name_oper
                 FROM transactions t
                 JOIN operation_types ot ON t.idoper = ot.id
                 WHERE t.dt >= %s and t.dt < %s
                 """
+    else:
+        return "Nothing to transfer. The source table is empty"
     delta = datetime.timedelta(hours=1)
     while True:
-        batch = get_data_batch(creds_src, date, query=query_in)
+        batch = get_data_batch(creds_src, date, query=query)
+        print(batch)
         if not batch:
             break
         insert_data_batch(creds_dst, batch)

@@ -55,3 +55,11 @@ CREATE TABLE transactions_denormalized (
 ENGINE = INNODB
 
 """
+
+
+destination_data_transaction = [
+    (1, datetime.datetime(2020, 1, 1, 0, 0, 0),
+     1, -1, 100, 'Subscription purchase'),
+    (2, datetime.datetime(2020, 1, 1, 1, 0, 0),
+     1, -1, 100, 'Subscription purchase'),
+]

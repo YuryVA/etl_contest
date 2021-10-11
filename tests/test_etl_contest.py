@@ -85,3 +85,46 @@ def test_transfer_all(mysql_source_image, mysql_destination_image):
             dst_result = c.fetchall()
 
     assert src_result == dst_result
+
+
+def test_resume_transfer(mysql_source_image, mysql_destination_image_2):
+    """
+
+    :param mysql_source_image: Контейнер mysql-источника с исходными данными
+    :param mysql_destination_image_2: Контейнер mysql-назначения
+    :return:
+    """
+
+    data_transfer(mysql_source_image, mysql_destination_image_2)
+
+    src_conn = pymysql.connect(
+        **mysql_source_image, cursorclass=pymysql.cursors.DictCursor
+    )
+
+    with src_conn:
+        with src_conn.cursor() as c:
+            src_query = """
+                    SELECT t.id, t.dt, t.idoper, t.move, t.amount,
+                    ot.name as name_oper
+                    FROM transactions t
+                    JOIN operation_types ot ON t.idoper = ot.id
+                """
+
+            c.execute(src_query)
+            src_result = c.fetchall()
+
+    dst_conn = pymysql.connect(
+        **mysql_destination_image_2, cursorclass=pymysql.cursors.DictCursor
+    )
+
+    with dst_conn:
+        with dst_conn.cursor() as c:
+            dst_query = """
+                    SELECT *
+                    FROM transactions_denormalized t
+                """
+
+            c.execute(dst_query)
+            dst_result = c.fetchall()
+
+    assert src_result == dst_result

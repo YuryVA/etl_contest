@@ -5,7 +5,8 @@ from .helpers import (get_session_id,
                       get_unused_port,
                       ping_container,
                       load_assets_to_source_db,
-                      load_struct_to_destination_db)
+                      load_struct_to_destination_db,
+                      load_assets_to_destination_db)
 
 
 BASE_DOCKER_IMAGE = 'percona/percona-server:5.7.32'
@@ -65,4 +66,12 @@ def mysql_source_image():
 def mysql_destination_image():
     with Container() as c:
         load_struct_to_destination_db(c.credentials)
+        yield c.credentials
+
+
+@pytest.fixture
+def mysql_destination_image_2():
+    with Container() as c:
+        load_struct_to_destination_db(c.credentials)
+        load_assets_to_destination_db(c.credentials)
         yield c.credentials
