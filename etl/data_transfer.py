@@ -77,7 +77,6 @@ def data_transfer(creds_src, creds_dst):
     delta = datetime.timedelta(hours=1)
     while True:
         batch = get_data_batch(creds_src, date, query=query)
-        print(batch)
         if not batch:
             break
         insert_data_batch(creds_dst, batch)
