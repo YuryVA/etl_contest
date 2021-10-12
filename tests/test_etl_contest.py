@@ -128,3 +128,15 @@ def test_resume_transfer(mysql_source_image, mysql_destination_image_2):
             dst_result = c.fetchall()
 
     assert src_result == dst_result
+
+
+def test_nothing_to_transfer(mysql_source_image_2, mysql_destination_image):
+    """
+
+    :param mysql_source_image_2: Контейнер mysql-источника с исходными данными
+    :param mysql_destination_image: Контейнер mysql-назначения
+    :return:
+    """
+
+    res = data_transfer(mysql_source_image_2, mysql_destination_image)
+    assert res == "Nothing to transfer. The source table is empty"
